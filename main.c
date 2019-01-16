@@ -1,5 +1,6 @@
 #include "aiv_renderer.h"
 #include <stdlib.h>
+#include <stdio.h>
 #define SDL_MAIN_HANDLED
 #include "C:\Users\marco\Desktop\SDL2-2.0.9\include\SDL.h"
 
@@ -11,13 +12,30 @@
 
 int main(int argc, char const *argv[])
 {
-    context_t ctx;
-    ctx.width = 600;
-    ctx.height = 600;
 
-    ctx.framebuffer = NULL;
-
-    triangle_t triangle = triangle(0, 0.5, 0, 0, -0.5, 0, -0.5, 0, 0);
+    context_t ctx = init_ctx(600, 600);
+    triangle_t triangle = triangle(0, 0.5, 0, 1, 0.8, 0, -0.5, 0, 0);
+    if (append_triangle(&ctx, triangle) == -1)
+    {
+        printf("1");
+    }
+    //don't work with values of 0.6 in sù, draw only 2 triangles even if there are more triangles to write
+    triangle = triangle(-1, 0.5, 0, 0.8, -0.5, 0, 0, 0.5, 0);
+    if (append_triangle(&ctx, triangle) == -1)
+    {
+        printf("2");
+    }
+    // triangle = triangle(-0.9, 0.9, 0, 0, 0.9, 0, -0.9, 0, 0);
+    // if (append_triangle(&ctx, triangle) == -1)
+    // {
+    //     printf("3");
+    // }
+    triangle = triangle(-0.9, 0, 0, 0, -0.9, 0, 0.9, -0.9, 0);
+    if (append_triangle(&ctx, triangle) == -1)
+    {
+        printf("4");
+    }
+    printf("ctx resize: %zu",ctx.array_size);
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window *window = SDL_CreateWindow("Title here", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, 600, 600, 0);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
@@ -32,7 +50,7 @@ int main(int argc, char const *argv[])
         }
         int pitch;
         SDL_LockTexture(texture, NULL, (void **)&ctx.framebuffer, &pitch);
-        rasterizer(&ctx, &triangle);
+        rasterizer(&ctx);
         SDL_UnlockTexture(texture);
         SDL_RenderCopy(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
